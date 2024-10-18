@@ -11,7 +11,7 @@ type impl struct {
 }
 
 func (i *impl) Start() {
-	i.r.Start()
+	i.r.Start() // Starts the router and server
 }
 
 func NewApp(rout router.Router) App {

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"main.go/config"
+	"main.go/controllers"
 )
 
 type Router interface {
@@ -23,7 +24,13 @@ func (i impel) Start() {
 		MaxAge:           12 * 3600,
 		AllowCredentials: true,
 	}))
-
+	i.gin.POST("/patient", func(context *gin.Context) {
+		controllers.PatientRegister(context, db)
+	})
+	i.gin.GET("/appoiment", func(context *gin.Context) {
+		controllers.GetAppointment(context, db)
+	})
+	i.gin.Run()
 }
 
 func NewRouter() Router {
