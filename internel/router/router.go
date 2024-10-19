@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"main.go/controllers"
+	"main.go/middleware"
 )
 
 type Router interface {
@@ -24,14 +25,26 @@ func (i impel) Start() {
 		AllowCredentials: true,
 	}))
 
-	i.gin.POST("signup", controllers.Signup)
+	i.gin.POST("/signup", controllers.Signup)
 	i.gin.POST("/logine", controllers.Logine)
 
-	i.gin.POST("/patient", controllers.PatientRegister)
-	i.gin.GET("/appoiment", controllers.GetAppointment)
-	i.gin.GET("/doctor", controllers.DoctorController)
-	i.gin.GET("/medicin", controllers.GetMedicine)
+	user := i.gin.Group("/user")
+	user.Use(middleware.AuthMiddleware())
+	{
+		user.POST("/patient", controllers.PatientRegister)
+		user.GET("/appoiment", controllers.GetAppointment)
+		user.GET("/doctor", controllers.DoctorController)
+		user.GET("/medicin", controllers.GetMedicine)
+	}
+	admin := i.gin.Group("/admin")
+	admin.Use(middleware.AdminMidleWare())
+	{
+		admin.GET("/users", controllers.GetAllUser)
+		admin.POST("/addUser", controllers.AddUser)
+		admin.PUT("/update/:id", controllers.UpdateUser)
+		admin.DELETE("/delete/:id", controllers.DeletUser)
 
+	}
 	i.gin.Run()
 }
 

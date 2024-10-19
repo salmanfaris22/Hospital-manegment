@@ -15,6 +15,5 @@ type User struct {
 	UserType  string `gorm:"size:20"`
 	//RefreshToken string    `gorm:"size:255"`
 	CreatedAt time.Time `gorm:"autoCreateTime"`
-	UpdatedAt time.Time `gorm:"autoUpdateTime"`
-	UserID    string    `gorm:"size:50"`
+	//UpdatedAt time.Time `gorm:"autoUpdateTime"`
 }

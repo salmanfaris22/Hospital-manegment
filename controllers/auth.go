@@ -16,7 +16,9 @@ var db *gorm.DB
 func init() {
 	db = config.DbInit()
 }
-
+func PassDb() *gorm.DB {
+	return db
+}
 func Signup(c *gin.Context) {
 	var user model.User
 	if err := c.ShouldBindJSON(&user); err != nil {
@@ -67,9 +69,22 @@ func Logine(ctx *gin.Context) {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"error": "Could not update token"})
 		return
 	}
+
+	if dbUser.UserType == "admin" {
+		ctx.Set("userType", "admin")
+	} else if dbUser.UserType == "user" {
+		ctx.Set("userType", "user")
+	}
+
+	userType, exists := ctx.Get("userType")
+	if !exists {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "User type not found"})
+		return
+	}
 	ctx.SetCookie("token", token, int(24*time.Hour.Seconds()), "/", "localhost", false, true)
 	ctx.JSON(200, gin.H{
-		"token": token,
-		"d":     dbUser,
+		"token":   token,
+		"d":       dbUser,
+		"userTpe": userType,
 	})
 }
