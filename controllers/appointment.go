@@ -59,6 +59,7 @@ func GetAppointment(ctx *gin.Context, db *gorm.DB) {
 			"appointment_token": appointment.TokenID,
 			"docter_name":       doc.DoctID,
 			"docte_id":          doc.DoctName,
+			"departMent":        doc.Dep,
 		})
 	}
 }

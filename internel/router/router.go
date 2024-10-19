@@ -30,6 +30,12 @@ func (i impel) Start() {
 	i.gin.GET("/appoiment", func(context *gin.Context) {
 		controllers.GetAppointment(context, db)
 	})
+	i.gin.GET("/doctor", func(context *gin.Context) {
+		controllers.DoctorController(context, db)
+	})
+	i.gin.GET("/medicin", func(context *gin.Context) {
+		controllers.GetMedicine(context, db)
+	})
 	i.gin.Run()
 }
 
