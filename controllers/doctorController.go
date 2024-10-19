@@ -11,7 +11,7 @@ type GetToken struct {
 	ID string `json:"id"`
 }
 
-func DoctorController(ctx *gin.Context, db *gorm.DB) {
+func DoctorController(ctx *gin.Context) {
 	var tokenID GetToken
 	err := ctx.BindJSON(&tokenID)
 	if err != nil {

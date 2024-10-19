@@ -3,12 +3,11 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"main.go/model"
 	"net/http"
 )
 
-func PatientRegister(ctx *gin.Context, db *gorm.DB) {
+func PatientRegister(ctx *gin.Context) {
 	var patient model.Patient
 
 	err := ctx.BindJSON(&patient)

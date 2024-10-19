@@ -3,13 +3,12 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"main.go/model"
 	"net/http"
 	"strings"
 )
 
-func GetMedicine(ctx *gin.Context, db *gorm.DB) {
+func GetMedicine(ctx *gin.Context) {
 	var med string
 	err := ctx.BindJSON(&med)
 	if err != nil {

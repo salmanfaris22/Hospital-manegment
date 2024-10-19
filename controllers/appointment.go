@@ -9,7 +9,7 @@ import (
 	"net/http"
 )
 
-func GetAppointment(ctx *gin.Context, db *gorm.DB) {
+func GetAppointment(ctx *gin.Context) {
 	var appointment model.Appointment
 	err := ctx.BindJSON(&appointment)
 	if err != nil {
