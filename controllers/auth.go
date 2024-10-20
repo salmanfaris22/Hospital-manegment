@@ -87,3 +87,10 @@ func Logine(ctx *gin.Context) {
 		"message":  "logine successfully",
 	})
 }
+
+func LogOut(ctx *gin.Context) {
+	ctx.SetCookie("token", "", -1, "/", "", false, true)
+	ctx.JSON(200, gin.H{
+		"message": "log out",
+	})
+}

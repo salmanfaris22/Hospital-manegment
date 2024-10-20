@@ -27,7 +27,7 @@ func (i impel) Start() {
 
 	i.gin.POST("/signup", controllers.Signup)
 	i.gin.POST("/logine", controllers.Logine)
-
+	i.gin.POST("/logout", controllers.LogOut)
 	user := i.gin.Group("/user")
 	user.Use(middleware.AuthMiddleware())
 	{
