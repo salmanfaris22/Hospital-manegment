@@ -44,11 +44,13 @@ func AddUser(ctx *gin.Context) {
 
 func UpdateUser(ctx *gin.Context) {
 	id := ctx.Param("id")
+
 	var user model.User
 	err := ctx.BindJSON(&user)
+	fmt.Println(user)
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
-			"message": err,
+			"message": "gtting eroror",
 		})
 	}
 	user.Password = utils.HashPassword(user.Password)
@@ -60,7 +62,7 @@ func UpdateUser(ctx *gin.Context) {
 		})
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "Updated created",
+		"message": "User Updated",
 		"user":    user,
 	})
 
@@ -68,6 +70,8 @@ func UpdateUser(ctx *gin.Context) {
 
 func DeletUser(ctx *gin.Context) {
 	id := ctx.Param("id")
+	fmt.Println(id)
+
 	err := db.Delete(&model.User{}, id).Error
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
@@ -76,6 +80,6 @@ func DeletUser(ctx *gin.Context) {
 		})
 	}
 	ctx.JSON(http.StatusOK, gin.H{
-		"message": "deleted User",
+		"message": " User deleted",
 	})
 }
