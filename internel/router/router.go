@@ -31,7 +31,6 @@ func (i impel) Start() {
 	user := i.gin.Group("/user")
 	user.Use(middleware.AuthMiddleware())
 	{
-		user.POST("/patient", controllers.PatientRegister)
 		user.GET("/appoiment", controllers.GetAppointment)
 		user.GET("/doctor", controllers.DoctorController)
 		user.GET("/medicin", controllers.GetMedicine)

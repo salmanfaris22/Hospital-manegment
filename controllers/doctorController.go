@@ -34,8 +34,8 @@ func DoctorController(ctx *gin.Context) {
 		return
 	}
 
-	var patient model.Patient
-	if err := db.First(&patient, token.PatientID).Error; err != nil {
+	var patient model.User
+	if err := db.First(&patient, token.UserID).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			ctx.JSON(200, gin.H{
 				"message": "patio ns not exist",
@@ -74,11 +74,12 @@ func DoctorController(ctx *gin.Context) {
 		})
 		return
 	}
+
 	ctx.JSON(200, gin.H{
 		"TokenID":      token.DoctorID,
 		"hellow":       doc,
 		"doc_name":     doc.DoctName,
-		"pationt_name": patient.Name,
+		"pationt_name": patient.FirstName,
 		"medicin":      "Aspirin,Ibuprofen",
 	})
 }
