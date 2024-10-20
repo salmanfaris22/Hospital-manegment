@@ -70,9 +70,22 @@ func UpdateUser(ctx *gin.Context) {
 
 func DeletUser(ctx *gin.Context) {
 	id := ctx.Param("id")
+	var user model.User
 	fmt.Println(id)
-
-	err := db.Delete(&model.User{}, id).Error
+	err := db.Where("id=?", id).First(&user).Error
+	if err != nil {
+		ctx.JSON(http.StatusInternalServerError, gin.H{
+			"message": "cant find user",
+			"err":     err,
+		})
+	}
+	if user.UserType == "admin" {
+		ctx.JSON(200, gin.H{
+			"message": "user cant delet Beacase He is Admin",
+		})
+		return
+	}
+	err = db.Delete(&model.User{}, id).Error
 	if err != nil {
 		ctx.JSON(http.StatusInternalServerError, gin.H{
 			"message": "cant find user",
