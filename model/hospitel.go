@@ -52,3 +52,8 @@ type Date struct {
 	Slot      string    `gorm:"type:varchar(20)" json:"slot"`
 	Doctor    Doctor    `gorm:"foreignKey:DoctorID;references:DoctID" json:"doctor"`
 }
+
+type AppointmentWithDoctor struct {
+	Appointment
+	DoctorName string `json:"doctor_name"`
+}

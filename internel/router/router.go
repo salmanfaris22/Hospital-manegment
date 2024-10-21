@@ -33,6 +33,8 @@ func (i impel) Start() {
 	user.Use(middleware.AuthMiddleware())
 	{
 		user.POST("/appoiment", controllers.GetAppointment)
+		user.GET("/getuserAppoiment", controllers.GetAllApoiment)
+		user.POST("/cancelAppiment", controllers.CancellApoiment)
 		user.GET("/doctor", controllers.DoctorController)
 		user.GET("/medicin", controllers.GetMedicine)
 	}

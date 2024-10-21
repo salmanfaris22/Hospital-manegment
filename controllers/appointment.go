@@ -3,6 +3,7 @@ package controllers
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"main.go/helpers"
 	"main.go/model"
 	"net/http"
 )
@@ -16,13 +17,12 @@ func GetAppointment(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": err})
 		return
 	}
-	var patient model.User
 
-	token, err := ctx.Cookie("token")
+	err, patient := helpers.UserFindHelp(ctx, db)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "token not font",
-			"err":     err.Error(),
+			"message": "pleas logine",
+			"err":     err,
 		})
 		return
 	}
@@ -31,23 +31,19 @@ func GetAppointment(ctx *gin.Context) {
 	err = db.Where("date_time = ? AND slot = ? AND doctor_id = ?", appointment.Date, appointment.Slot, appointment.DoctorID).First(&tempdate).Error
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "this date Booked",
+			"message": "this cant find slot Booked",
 			"err":     err,
 		})
 		return
 	}
-	if tempdate.Available == true {
-
-	}
-
-	err = db.Where("token = ?", token).First(&patient).Error
-	if err != nil {
+	if tempdate.Available != true {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "Appointment not found",
-			"err":     err.Error(),
+			"message": "this slot Booked",
+			"err":     err,
 		})
 		return
 	}
+
 	//appointment.PatientName=
 	appointment.UserID = patient.ID
 	appointment.User = patient
@@ -70,19 +66,24 @@ func GetAppointment(ctx *gin.Context) {
 	}
 
 	tempdate.Available = false
-	tempdate.UserId = appointment.User.ID
+	tempdate.UserId = appointment.UserID
 	db.Create(&tempdate)
 	err = db.Model(&tempdate).
 		Where("date_time = ? AND doctor_id = ? AND slot = ?", appointment.Date, appointment.DoctorID, appointment.Slot).
-		Update("available", false).Error
+		Updates(map[string]interface{}{
+			"available": false,
+			"user_id":   appointment.User.ID,
+		}).Error
 
 	if err != nil {
-
 		fmt.Println("Error updating availability:", err)
 		return
 	}
 	fmt.Println(appointment.Age)
 	appointment.Doctor = doc
+	appointment.Doctor.TimeSlot2 = appointment.Slot
+	db.Create(&appointment)
+
 	ctx.JSON(200, gin.H{
 		"message":      "your slot is Booked Be Redy",
 		"time":         tempdate.Slot,
@@ -90,7 +91,56 @@ func GetAppointment(ctx *gin.Context) {
 		"docName":      doc.DoctName,
 		"dep":          doc.Dep,
 		"patient_name": appointment.PatientName,
-		"age":          appointment,
+		"age":          appointment.Age,
+		"token_id":     appointment.TokenID,
 	})
 
+}
+
+func GetAllApoiment(ctx *gin.Context) {
+	var results []model.AppointmentWithDoctor
+	err, user := helpers.UserFindHelp(ctx, db)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "pleas logine",
+			"err":     err,
+		})
+		return
+	}
+	err = db.Table("appointments").
+		Select("appointments.*,doctors.doct_name as doctor_name").
+		Joins("JOIN doctors ON doctors.doct_id = appointments.doctor_id").
+		Where("appointments.user_id = ?", user.ID).
+		Scan(&results).Error
+	if err != nil {
+		ctx.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+	ctx.JSON(200, gin.H{
+		"message": results,
+	})
+}
+
+func CancellApoiment(ctx *gin.Context) {
+	var results model.AppointmentWithDoctor
+	err := ctx.BindJSON(&results)
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "pleas logine",
+			"err":     err,
+		})
+		return
+	}
+	err = db.Delete(&model.Appointment{}, results.TokenID).Error
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "cant find apiment",
+			"err":     err,
+		})
+		return
+	}
+	db.Model(&model.Date{}).Where("date_time=?", results.UserID)
+	ctx.JSON(http.StatusOK, gin.H{
+		"message": " Apoimnet  deleted",
+	})
 }
