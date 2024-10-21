@@ -26,6 +26,20 @@ func GetAppointment(ctx *gin.Context) {
 		})
 		return
 	}
+
+	var tempdate model.Date
+	err = db.Where("date_time = ? AND slot = ? AND doctor_id = ?", appointment.Date, appointment.Slot, appointment.DoctorID).First(&tempdate).Error
+	if err != nil {
+		ctx.JSON(http.StatusNotFound, gin.H{
+			"message": "this date Booked",
+			"err":     err,
+		})
+		return
+	}
+	if tempdate.Available == true {
+
+	}
+
 	err = db.Where("token = ?", token).First(&patient).Error
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
@@ -55,17 +69,28 @@ func GetAppointment(ctx *gin.Context) {
 		doc.TimeSlot2 = "booked"
 	}
 
-	err = db.Save(&doc).Error
+	tempdate.Available = false
+	tempdate.UserId = appointment.User.ID
+	db.Create(&tempdate)
+	err = db.Model(&tempdate).
+		Where("date_time = ? AND doctor_id = ? AND slot = ?", appointment.Date, appointment.DoctorID, appointment.Slot).
+		Update("available", false).Error
+
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "docter is bys",
-			"err":     err.Error(),
-		})
+
+		fmt.Println("Error updating availability:", err)
 		return
 	}
+	fmt.Println(appointment.Age)
 	appointment.Doctor = doc
 	ctx.JSON(200, gin.H{
-		"message": appointment,
+		"message":      "your slot is Booked Be Redy",
+		"time":         tempdate.Slot,
+		"date":         tempdate.DateTime,
+		"docName":      doc.DoctName,
+		"dep":          doc.Dep,
+		"patient_name": appointment.PatientName,
+		"age":          appointment,
 	})
 
 }

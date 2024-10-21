@@ -83,3 +83,11 @@ func DoctorController(ctx *gin.Context) {
 		"medicin":      "Aspirin,Ibuprofen",
 	})
 }
+
+func DatesSet(ctx *gin.Context) {
+	var date []model.Date
+	db.Find(&date)
+	ctx.JSON(200, gin.H{
+		"message": date,
+	})
+}

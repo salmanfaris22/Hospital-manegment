@@ -12,6 +12,7 @@ import "time"
 ////}
 
 // Appointment Model
+
 type Appointment struct {
 	TokenID     uint      `gorm:"primaryKey:autoIncrement"`
 	PatientName string    `gorm:"size:24" json:"patient_name"`
@@ -44,8 +45,9 @@ type Medicine struct {
 
 type Date struct {
 	ID        uint      `gorm:"primaryKey:autoIncrement" json:"id"`
-	DateTime  time.Time `gorm:"type:timestamp" json:"date_time"`
+	DateTime  time.Time `gorm:"type:date" json:"date_time"`
 	DoctorID  uint      `gorm:"not null" json:"doctor_id"`
+	UserId    uint      `gorm:"size:24"`
 	Available bool      `gorm:"default:true" json:"available"`
 	Slot      string    `gorm:"type:varchar(20)" json:"slot"`
 	Doctor    Doctor    `gorm:"foreignKey:DoctorID;references:DoctID" json:"doctor"`

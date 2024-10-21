@@ -28,10 +28,11 @@ func (i impel) Start() {
 	i.gin.POST("/signup", controllers.Signup)
 	i.gin.POST("/logine", controllers.Logine)
 	i.gin.POST("/logout", controllers.LogOut)
+	i.gin.GET("/dates", controllers.DatesSet)
 	user := i.gin.Group("/user")
 	user.Use(middleware.AuthMiddleware())
 	{
-		user.GET("/appoiment", controllers.GetAppointment)
+		user.POST("/appoiment", controllers.GetAppointment)
 		user.GET("/doctor", controllers.DoctorController)
 		user.GET("/medicin", controllers.GetMedicine)
 	}
