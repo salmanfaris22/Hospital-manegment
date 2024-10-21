@@ -19,9 +19,11 @@ type Appointment struct {
 	Age         int       `gorm:"size:2" json:"age"`
 	Place       string    `gorm:"size:24" json:"place"`
 	Date        time.Time `gorm:"type:date" json:"date"`
+	DateID      uint      `gorm:"primaryKey:autoIncrement" json:"id"`
 	Slot        string    `gorm:"not null" json:"slot"`
 	UserID      uint      `gorm:"size:24" json:"user_id"`
 	DoctorID    uint      `gorm:"not null" json:"doctor_id"`
+	Dates       Date      `gorm:"foreignKey:DateID;references:ID" json:"date_id"`
 	User        User      `gorm:"foreignKey:UserID;references:ID" json:"user"`
 	Doctor      Doctor    `gorm:"foreignKey:DoctorID;references:DoctID" json:"doctor"`
 }
@@ -56,4 +58,5 @@ type Date struct {
 type AppointmentWithDoctor struct {
 	Appointment
 	DoctorName string `json:"doctor_name"`
+	DateID     uint   `json:"date_id"`
 }

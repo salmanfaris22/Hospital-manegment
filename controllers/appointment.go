@@ -82,6 +82,7 @@ func GetAppointment(ctx *gin.Context) {
 	fmt.Println(appointment.Age)
 	appointment.Doctor = doc
 	appointment.Doctor.TimeSlot2 = appointment.Slot
+	appointment.DateID = tempdate.ID
 	db.Create(&appointment)
 
 	ctx.JSON(200, gin.H{
@@ -96,7 +97,6 @@ func GetAppointment(ctx *gin.Context) {
 	})
 
 }
-
 func GetAllApoiment(ctx *gin.Context) {
 	var results []model.AppointmentWithDoctor
 	err, user := helpers.UserFindHelp(ctx, db)
@@ -116,6 +116,7 @@ func GetAllApoiment(ctx *gin.Context) {
 		ctx.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
+
 	ctx.JSON(200, gin.H{
 		"message": results,
 	})
@@ -126,20 +127,27 @@ func CancellApoiment(ctx *gin.Context) {
 	err := ctx.BindJSON(&results)
 	if err != nil {
 		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "pleas logine",
+			"message": "pleas slelect apoiment",
 			"err":     err,
 		})
 		return
 	}
-	err = db.Delete(&model.Appointment{}, results.TokenID).Error
+	err = db.Model(&model.Date{}).
+		Where("id=?", results.DateID).
+		Update("available", true).Error
+
 	if err != nil {
-		ctx.JSON(http.StatusNotFound, gin.H{
-			"message": "cant find apiment",
-			"err":     err,
-		})
+		fmt.Println("Error updating availability:", err)
 		return
 	}
-	db.Model(&model.Date{}).Where("date_time=?", results.UserID)
+	err = db.Where("date_id = ?", results.DateID).Delete(&model.Appointment{}).Error
+	fmt.Println(results.DateID)
+
+	if err != nil {
+		fmt.Println("Error deleting appointment:", err)
+		return
+	}
+
 	ctx.JSON(http.StatusOK, gin.H{
 		"message": " Apoimnet  deleted",
 	})
